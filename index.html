@@ -1,0 +1,377 @@
+<!DOCTYPE html>  
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Windows 12 - Cert dc Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.75);
+            --blur: blur(30px);
+            --accent: #0078d4;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000;
+        }
+
+        /* --- SYSTEM COMPONENTS --- */
+        #boot-screen {
+            position: fixed; inset: 0; background: black;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999; color: white;
+        }
+        
+        /* Styl dla nowego logo bootowania */
+        .boot-logo {
+            width: 150px; 
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #0078d4;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin-top: 20px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        #login-screen {
+            position: fixed; inset: 0; display: none; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 9000; color: white;
+            background: url('logo start ekranu.png') center/cover; /* Zmienione na boot ekran.png */
+            backdrop-filter: blur(15px); text-align: center;
+        }
+
+        #system-ui { display: none; height: 100%; position: relative; }
+        #desktop {
+            width: 100%; height: calc(100% - 50px);
+            background: linear-gradient(135deg, #7b61ff 0%, #ff82e2 100%);
+            position: relative; overflow: hidden;
+        }
+
+        /* --- ICONS --- */
+        .desktop-icon {
+            width: 90px; height: 100px; position: absolute;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; border-radius: 6px; user-select: none; transition: 0.2s;
+        }
+        .desktop-icon:hover { background: rgba(255,255,255,0.2); }
+        .desktop-icon i { font-size: 45px; margin-bottom: 5px; }
+        .desktop-icon span { color: white; font-size: 11px; text-shadow: 1px 1px 3px #000; text-align: center; }
+
+        /* --- WINDOWS --- */
+        .window {
+            position: absolute; top: 40px; left: 80px; width: 900px; height: 600px;
+            background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: none; flex-direction: column; overflow: hidden; z-index: 100;
+            min-width: 300px; min-height: 200px;
+        }
+        .resizer {
+            width: 15px; height: 15px; background: transparent;
+            position: absolute; right: 0; bottom: 0; cursor: nwse-resize; z-index: 101;
+        }
+        .title-bar { background: #f3f3f3; padding: 12px 18px; display: flex; justify-content: space-between; cursor: move; border-bottom: 1px solid #ddd; align-items: center;}
+        .win-controls { display: flex; gap: 15px; align-items: center; }
+        .win-btn:hover { color: var(--accent); cursor: pointer; transform: scale(1.2); }
+        .close-btn:hover { color: red !important; }
+        
+        .win-body { display: flex; flex-grow: 1; overflow: hidden; }
+
+        .sidebar { width: 180px; background: #f9f9f9; border-right: 1px solid #eee; padding: 10px; }
+        .sidebar-item { padding: 10px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; border-radius: 5px; }
+        .sidebar-item:hover { background: #e5e5e5; }
+        .main-view { flex-grow: 1; padding: 20px; overflow-y: auto; }
+
+        /* BROWSER UI */
+        .browser-nav { display: flex; gap: 10px; padding: 10px; background: #eee; border-bottom: 1px solid #ccc; align-items: center; }
+        .browser-nav input { flex-grow: 1; padding: 8px 15px; border-radius: 20px; border: 1px solid #bbb; outline: none; }
+        .browser-container { position: relative; flex-grow: 1; background: #fff; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; background: white; }
+
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        .game-card { border: 1px solid #ddd; border-radius: 10px; overflow: hidden; cursor: pointer; text-align: center; padding-bottom: 10px; transition: 0.3s; background: #fff; }
+        .game-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .game-card i { font-size: 50px; padding: 20px 0; display: block; }
+        .game-card p { margin: 5px 0; font-weight: bold; }
+
+        /* --- TASKBAR --- */
+        #taskbar {
+            position: fixed; bottom: 0; width: 100%; height: 50px;
+            background: var(--glass); backdrop-filter: var(--blur);
+            display: flex; justify-content: center; align-items: center; z-index: 3000;
+        }
+        .task-center { display: flex; gap: 15px; align-items: center; }
+        .start-btn { width: 30px; height: 30px; cursor: pointer; color: #0078d4; font-size: 25px; }
+        #taskbar-clock { position: absolute; right: 20px; font-size: 13px; text-align: right; user-select: none; }
+
+        /* --- START MENU --- */
+        #start-menu {
+            position: fixed; bottom: -700px; left: 50%; transform: translateX(-50%);
+            width: 500px; height: 550px; background: rgba(243, 243, 243, 0.95);
+            backdrop-filter: blur(40px); border-radius: 15px; transition: 0.3s; z-index: 2000; padding: 20px;
+        }
+        #start-menu.active { bottom: 60px; }
+    </style>
+</head>
+<body onclick="closeMenus()">
+
+    <div id="boot-screen">
+        <img src="boot ekran.png" alt="Logo" class="boot-logo">
+        <div class="loader"></div>
+        <div style="margin-top: 20px; font-weight: bold; letter-spacing: 2px;">WINDOWS 12</div>
+    </div>
+
+    <div id="login-screen">
+        <i class="fa-solid fa-circle-user" style="font-size: 80px; margin-bottom: 20px;"></i>
+        <h2>Certi_osint_sieć</h2>
+        <input type="password" id="pass-field" placeholder="Hasło (1234)" style="padding: 10px; border-radius: 5px; border:none; width: 200px; text-align: center;">
+        <p style="font-size: 12px; opacity: 0.7;">Wciśnij Enter, aby się zalogować</p>
+    </div>
+
+    <div id="system-ui">
+        <div id="desktop">
+            <div class="desktop-icon" style="top:20px; left:20px;" ondblclick="openApp('pc')">
+                <i class="fa-solid fa-computer" style="color:#0078d4"></i>
+                <span>Ten komputer</span>
+            </div>
+            <div class="desktop-icon" style="top:20px; left:120px;" ondblclick="openApp('browser')">
+                <i class="fa-brands fa-edge" style="color:#0078d4"></i>
+                <span>Przeglądarka</span>
+            </div>
+            <div class="desktop-icon" style="top:130px; left:20px;" ondblclick="openApp('games')">
+                <i class="fa-solid fa-gamepad" style="color:#e91e63"></i>
+                <span>Gry</span>
+            </div>
+        </div>
+
+        <div id="window-browser" class="window">
+            <div class="title-bar" onmousedown="dragElement(this.parentElement)">
+                <span><i class="fa-brands fa-edge"></i> Microsoft Edge (Unrestricted)</span>
+                <div class="win-controls">
+                    <i class="fa-regular fa-square win-btn" onclick="maximizeWin('window-browser')"></i>
+                    <span class="close-btn win-btn" onclick="closeApp('browser')">×</span>
+                </div>
+            </div>
+            <div class="browser-nav">
+                <i class="fa-solid fa-house" style="cursor:pointer" onclick="goHome()"></i>
+                <input type="text" id="browser-url" placeholder="Wpisz URL lub szukaj..." onkeydown="if(event.key==='Enter') navigate()">
+                <button onclick="navigate()" style="cursor:pointer; padding: 5px 15px; border-radius: 15px; border:none; background:#0078d4; color:white;">Go</button>
+            </div>
+            <div class="browser-container" id="browser-view">
+                <iframe id="web-frame" src="https://duckduckgo.com/search?q=Windows+12&kp=-1"></iframe>
+            </div>
+            <div class="resizer" onmousedown="resizeElement(this.parentElement)"></div>
+        </div>
+
+        <div id="window-pc" class="window">
+            <div class="title-bar" onmousedown="dragElement(this.parentElement)">
+                <span>Ten komputer</span>
+                <div class="win-controls">
+                    <i class="fa-regular fa-square win-btn" onclick="maximizeWin('window-pc')"></i>
+                    <span class="close-btn win-btn" onclick="closeApp('pc')">×</span>
+                </div>
+            </div>
+            <div class="win-body">
+                <div class="sidebar">
+                    <div class="sidebar-item" onclick="loadDriveC()"><i class="fa-solid fa-hard-drive"></i> Windows (C:)</div>
+                </div>
+                <div id="pc-content" class="main-view"></div>
+            </div>
+            <div class="resizer" onmousedown="resizeElement(this.parentElement)"></div>
+        </div>
+
+        <div id="window-games" class="window">
+            <div class="title-bar" onmousedown="dragElement(this.parentElement)">
+                <span>Centrum Gier</span>
+                <div class="win-controls">
+                    <i class="fa-solid fa-expand win-btn" title="Pełny ekran gry" onclick="toggleFullScreenGame()"></i>
+                    <i class="fa-regular fa-square win-btn" onclick="maximizeWin('window-games')"></i>
+                    <span class="close-btn win-btn" onclick="closeApp('games')">×</span>
+                </div>
+            </div>
+            <div class="main-view" id="game-container">
+                <h3 id="game-status">Wybierz grę</h3>
+                <div class="game-grid" id="game-list">
+                    <div class="game-card" onclick="playGame('https://archive.org/embed/doom_20221019')">
+                        <i class="fa-solid fa-skull" style="color: #b71c1c;"></i>
+                        <p>DOOM</p>
+                    </div>
+                    <div class="game-card" onclick="playGame('https://freepacman.org/')">
+                        <i class="fa-solid fa-ghost" style="color: #fbc02d;"></i>
+                        <p>Mini gry</p>
+                    </div>
+                    <div class="game-card" onclick="playGame('https://classic.minecraft.net/')">
+                        <i class="fa-solid fa-worm" style="color: #4caf50;"></i>
+                        <p>minecraft</p>
+                    </div>
+                </div>
+                <button id="back-to-games" onclick="resetGameView()" style="display:none; margin-top:10px; padding:8px 15px; cursor:pointer; border-radius:5px; border:1px solid #ccc;">⬅ Powrót</button>
+                <iframe id="game-frame" style="display:none; width:100%; height:420px; margin-top:15px; border-radius:8px; border:1px solid #333;"></iframe>
+            </div>
+            <div class="resizer" onmousedown="resizeElement(this.parentElement)"></div>
+        </div>
+
+        <div id="taskbar">
+            <div class="task-center">
+                <i class="fa-brands fa-windows start-btn" onclick="toggleStart(event)"></i>
+                <i class="fa-brands fa-edge" style="font-size: 24px; color: #0078d4; cursor:pointer;" onclick="openApp('browser')"></i>
+                <i class="fa-solid fa-folder" style="font-size: 24px; color: #ffca28; cursor:pointer;" onclick="openApp('pc')"></i>
+            </div>
+            <div id="taskbar-clock">00:00<br>01.01.2024</div>
+        </div>
+
+        <div id="start-menu" onclick="event.stopPropagation()">
+            <h4>Przypięte aplikacje</h4>
+            <div style="display:flex; gap:20px;">
+                <div onclick="openApp('browser')" style="text-align:center; cursor:pointer;"><i class="fa-brands fa-edge" style="font-size:30px; color:#0078d4"></i><br>Edge</div>
+                <div onclick="openApp('games')" style="text-align:center; cursor:pointer;"><i class="fa-solid fa-gamepad" style="font-size:30px; color:#e91e63"></i><br>Gry</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('keydown', (e) => {
+            if(e.key === "Enter") {
+                if(document.getElementById('login-screen').style.display !== 'none') checkLogin();
+            }
+            if(e.key === "Meta") toggleStart(e);
+        });
+
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('boot-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('pass-field').focus();
+            }, 2000);
+            updateClock();
+            setInterval(updateClock, 1000);
+            loadDriveC();
+        };
+
+        function checkLogin() {
+            if(document.getElementById('pass-field').value === "1234") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('system-ui').style.display = 'block';
+            } else { alert("Błędne hasło! Wpisz 1234"); }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('taskbar-clock').innerHTML = `${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}<br>${now.toLocaleDateString()}`;
+        }
+
+        async function navigate() {
+            const val = document.getElementById('browser-url').value;
+            const frame = document.getElementById('web-frame');
+            if(!val) return;
+
+            let targetUrl = val.includes('.') && !val.includes(' ') ? 
+                           (val.startsWith('http') ? val : 'https://' + val) : 
+                           'https://google.com/search?q=' + encodeURIComponent(val);
+
+            const needsProxy = ["google.com", "wikipedia.org", "facebook.com", "github.com", "bing.com", "onet.pl", "wp.pl"];
+
+            if(needsProxy.some(site => targetUrl.toLowerCase().includes(site))) {
+                try {
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
+                    const data = await response.json();
+                    const blob = new Blob([data.contents], { type: 'text/html' });
+                    frame.src = URL.createObjectURL(blob);
+                } catch (e) {
+                    frame.src = targetUrl;
+                }
+            } else {
+                frame.src = targetUrl;
+            }
+        }
+
+        function goHome() {
+            document.getElementById('web-frame').src = "https://www.google.com/?hl=pl&zx=1774732086962&no_sw_cr=1";
+            document.getElementById('browser-url').value = "https://www.google.com/?hl=pl&zx=1774732086962&no_sw_cr=1";
+        }
+
+        function playGame(url) {
+            document.getElementById('game-list').style.display = 'none';
+            document.getElementById('game-status').innerText = "Gra włączona";
+            document.getElementById('back-to-games').style.display = 'block';
+            const frame = document.getElementById('game-frame');
+            frame.src = url;
+            frame.style.display = 'block';
+        }
+
+        function resetGameView() {
+            document.getElementById('game-list').style.display = 'grid';
+            document.getElementById('game-status').innerText = "Wybierz grę";
+            document.getElementById('back-to-games').style.display = 'none';
+            const frame = document.getElementById('game-frame');
+            frame.src = "";
+            frame.style.display = 'none';
+        }
+
+        function toggleFullScreenGame() {
+            const elem = document.getElementById("game-frame");
+            if (elem.requestFullscreen) { elem.requestFullscreen(); }
+        }
+
+        function loadDriveC() {
+            document.getElementById('pc-content').innerHTML = `<h4>Windows (C:)</h4><div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px;"><div style="text-align:center;"><i class="fa-solid fa-folder" style="font-size:40px; color:#ffca28"></i><br><span>Windows</span></div></div>`;
+        }
+
+        function openApp(id) {
+            const win = document.getElementById('window-' + id);
+            win.style.display = 'flex';
+            win.style.zIndex = 100 + document.querySelectorAll('.window[style*="display: flex"]').length;
+            document.getElementById('start-menu').classList.remove('active');
+        }
+
+        function closeApp(id) { document.getElementById('window-' + id).style.display = 'none'; }
+
+        function toggleStart(e) {
+            e.stopPropagation();
+            document.getElementById('start-menu').classList.toggle('active');
+        }
+
+        function closeMenus() { document.getElementById('start-menu').classList.remove('active'); }
+
+        function maximizeWin(id) {
+            const win = document.getElementById(id);
+            if (win.style.width === "100%") {
+                win.style.width = "900px"; win.style.height = "600px"; win.style.top = "40px"; win.style.left = "80px";
+            } else {
+                win.style.width = "100%"; win.style.height = "calc(100% - 50px)"; win.style.top = "0"; win.style.left = "0";
+            }
+        }
+
+        function dragElement(elmnt) {
+            var p1 = 0, p2 = 0, p3 = 0, p4 = 0;
+            elmnt.onmousedown = (e) => {
+                if (e.target.classList.contains('win-btn')) return;
+                p3 = e.clientX; p4 = e.clientY;
+                document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
+                document.onmousemove = (e) => {
+                    p1 = p3 - e.clientX; p2 = p4 - e.clientY;
+                    p3 = e.clientX; p4 = e.clientY;
+                    elmnt.style.top = (elmnt.offsetTop - p2) + "px";
+                    elmnt.style.left = (elmnt.offsetLeft - p1) + "px";
+                };
+            };
+        }
+
+        function resizeElement(elmnt) {
+            window.onmousedown = (e) => {
+                let startX = e.clientX;
+                let startY = e.clientY;
+                let startWidth = parseInt(document.defaultView.getComputedStyle(elmnt).width, 10);
+                let startHeight = parseInt(document.defaultView.getComputedStyle(elmnt).height, 10);
+                document.onmousemove = (e) => {
+                    elmnt.style.width = (startWidth + e.clientX - startX) + 'px';
+                    elmnt.style.height = (startHeight + e.clientY - startY) + 'px';
+                };
+                document.onmouseup = () => { document.onmousemove = null; document.onmouseup = null; };
+            };
+        }
+    </script>
+</body>
+</html>
