@@ -18,16 +18,15 @@
             font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000;
         }
 
-        /* --- POPRAWIONY BOOT SCREEN --- */
+        /* --- BOOT SCREEN --- */
         #boot-screen {
             position: fixed; inset: 0; display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 10000; color: white;
             background: black;
         }
 
-        /* Styl dla Twojego pliku graficznego */
         .boot-logo-img {
-            width: 160px; /* Możesz zmienić rozmiar tutaj */
+            width: 160px;
             height: auto;
             margin-bottom: 40px;
             animation: pulseLogo 2s ease-in-out infinite;
@@ -40,18 +39,12 @@
         }
 
         .boot-loader-bar {
-            width: 250px;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
+            width: 250px; height: 4px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; position: relative; overflow: hidden;
         }
 
         .boot-loader-progress {
-            position: absolute;
-            height: 100%;
-            width: 40%;
+            position: absolute; height: 100%; width: 40%;
             background: linear-gradient(90deg, transparent, var(--accent), transparent);
             animation: slideProgress 1.5s infinite linear;
         }
@@ -61,7 +54,7 @@
             100% { left: 100%; }
         }
 
-        /* Pozostałe ekrany */
+        /* Ekrany systemowe */
         #login-screen, #welcome-screen, #shutdown-screen, #final-screen {
             position: fixed; inset: 0; display: none; flex-direction: column;
             align-items: center; justify-content: center; z-index: 10000; color: white;
@@ -82,47 +75,47 @@
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- RESZTA STYLÓW --- */
-        #system-ui { display: none; height: 100%; position: relative; }
+        /* --- INTERFEJS SYSTEMU --- */
+        #system-ui { display: none; height: 100%; position: relative; z-index: 100; }
+        
         #desktop {
             width: 100%; height: calc(100% - 50px);
             background: url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1974') center/cover;
             position: relative; padding: 20px;
         }
+
         .desktop-icon { width: 90px; padding: 10px; margin-bottom: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-align: center; font-size: 12px; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); transition: 0.2s; }
         .desktop-icon:hover { background: rgba(255,255,255,0.2); border-radius: 8px; }
         .desktop-icon i { font-size: 40px; margin-bottom: 8px; }
-        .window { position: absolute; top: 50px; left: 100px; width: 850px; height: 550px; background: white; border-radius: 12px; box-shadow: var(--shadow); display: none; flex-direction: column; overflow: hidden; z-index: 100; }
+
+        .window { position: absolute; top: 50px; left: 100px; width: 850px; height: 550px; background: white; border-radius: 12px; box-shadow: var(--shadow); display: none; flex-direction: column; overflow: hidden; z-index: 500; }
         .title-bar { background: #f3f3f3; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #ddd; }
-        .win-controls span { margin-left: 15px; cursor: pointer; font-size: 18px; padding: 5px; }
+        .win-controls span { margin-left: 15px; cursor: pointer; font-size: 18px; padding: 5px; color: #333; }
+        
         .main-view { padding: 20px; flex-grow: 1; overflow-y: auto; color: #333; }
-        #pc-home-view { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; width: fit-content; cursor: pointer; }
-        #pc-home-view:hover { background: #f0f0f0; }
-        .file-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .file-table th { text-align: left; border-bottom: 1px solid #ddd; padding: 10px; font-size: 13px; color: #666; }
-        .file-table td { padding: 8px 10px; font-size: 14px; }
-        .file-table tr:hover { background: #e8f4ff; }
-        iframe { border: none; width: 100%; height: 100%; flex-grow: 1; }
-        #game-list { padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .game-card { padding: 15px; text-align: center; background: #f8f9fa; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .game-card:hover { background: #e2e6ea; transform: translateY(-5px); }
-        .game-card i { font-size: 30px; margin-bottom: 10px; }
         #taskbar { position: fixed; bottom: 0; width: 100%; height: 50px; background: var(--glass); backdrop-filter: var(--blur); display: flex; justify-content: center; align-items: center; z-index: 5000; }
-        .task-icons i { font-size: 24px; cursor: pointer; margin: 0 12px; transition: 0.2s; }
+        .task-icons i { font-size: 24px; cursor: pointer; margin: 0 12px; transition: 0.2s; color: #333; }
+        
         #clock-area { position: absolute; right: 20px; font-size: 11px; text-align: right; color: #333; cursor: pointer; }
+
         #start-menu { position: fixed; bottom: -650px; left: 50%; transform: translateX(-50%); width: 500px; height: 550px; background: rgba(255,255,255,0.95); backdrop-filter: var(--blur); border-radius: 15px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 4000; padding: 25px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
         #start-menu.active { bottom: 60px; }
-        #widgets-panel, #notif-panel { position: fixed; top: 10px; bottom: 60px; width: 320px; background: var(--glass); backdrop-filter: var(--blur); border-radius: 20px; transition: 0.4s; z-index: 6000; padding: 20px; box-shadow: var(--shadow); }
+        
+        #widgets-panel, #notif-panel { position: fixed; top: 10px; bottom: 60px; width: 320px; background: var(--glass); backdrop-filter: var(--blur); border-radius: 20px; transition: 0.4s; z-index: 6000; padding: 20px; box-shadow: var(--shadow); color: #333; }
         #widgets-panel { left: -400px; }
         #widgets-panel.active { left: 10px; }
         #notif-panel { right: -400px; }
         #notif-panel.active { right: 10px; }
+
+        iframe { border: none; width: 100%; height: 100%; }
+        .game-card { padding: 15px; text-align: center; background: #f8f9fa; border-radius: 10px; cursor: pointer; transition: 0.3s; color: #333; }
+        .game-card:hover { background: #e2e6ea; transform: translateY(-5px); }
     </style>
 </head>
 <body onclick="closeAllPanels()">
 
     <div id="boot-screen">
-        <img src="boot.png" class="boot-logo-img" alt="">
+        <img src="boot.png" class="boot-logo-img" alt="Logo">
         <div class="boot-loader-bar">
             <div class="boot-loader-progress"></div>
         </div>
@@ -143,10 +136,10 @@
 
     <div id="final-screen">
         <p style="font-size: 1.8rem;">Można teraz bezpiecznie wyłączyć system.</p>
-        <button onclick="location.reload()" style="margin-top:20px; cursor:pointer; padding: 5px 15px;">Uruchom ponownie</button>
+        <button onclick="location.reload()" style="margin-top:20px; cursor:pointer; padding: 10px 20px; border-radius: 5px; border: none; background: var(--accent); color: white;">Uruchom ponownie</button>
     </div>
 
-  div id="system-ui">
+    <div id="system-ui">
         <div id="desktop">
             <div class="desktop-icon" ondblclick="openApp('pc')">
                 <i class="fa-solid fa-computer" style="color: #ffa704;"></i><span>Ten komputer</span>
@@ -172,13 +165,10 @@
                 <span>Centrum Gier</span>
                 <div class="win-controls"><span onclick="closeApp('games')">×</span></div>
             </div>
-            <div id="game-list">
-               <div class="game-card" onclick="playGame('https://archive.org/embed/doom_20221019')"><i class="fa-solid fa-skull" style="color: #b71c1c;"></i><p>DOOM</p></div>
-                    <div class="game-card" onclick="playGame('https://freepacman.org/')"><i class="fa-solid fa-ghost" style="color: #fbc02d;"></i><p>Pac-Man</p></div>
-                    <div class="game-card" onclick="playGame('https://classic.minecraft.net/')"><i class="fa-solid fa-cube" style="color: #4caf50;"></i><p>Minecraft</p></div>
-                    <div class="game-card" onclick="playGame('https://tetris.com/play-tetris')"><i class="fa-solid fa-cubes" style="color: #0078d4;"></i><p>Tetris</p></div>
-                    <div class="game-card" onclick="playGame('https://minesweeper.online/game/5868293425')"><i class="fa-solid fa-bomb" style="color: #555;"></i><p>Saper</p></div>
-                    <div class="game-card" onclick="playGame('https://slithergame.io/')"><i class="fa-solid fa-dragon" style="color: #8e44ad;"></i><p>Slither.io</p></div>
+            <div id="game-list" style="padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                <div class="game-card" onclick="playGame('https://freepacman.org/')"><i class="fa-solid fa-ghost" style="color: #fbc02d; font-size: 30px;"></i><p>Pac-Man</p></div>
+                <div class="game-card" onclick="playGame('https://classic.minecraft.net/')"><i class="fa-solid fa-cube" style="color: #4caf50; font-size: 30px;"></i><p>Minecraft</p></div>
+                <div class="game-card" onclick="playGame('https://tetris.com/play-tetris')"><i class="fa-solid fa-cubes" style="color: #0078d4; font-size: 30px;"></i><p>Tetris</p></div>
             </div>
             <iframe id="game-iframe" style="display:none;"></iframe>
         </div>
@@ -189,29 +179,14 @@
                 <div class="win-controls"><span onclick="closeApp('pc')">×</span></div>
             </div>
             <div class="main-view">
-                <div id="pc-home-view" onclick="openDriveC()">
+                <div id="pc-home-view" onclick="openDriveC()" style="display: flex; align-items: center; gap: 15px; border: 1px solid #ddd; padding: 15px; border-radius: 8px; cursor: pointer;">
                     <i class="fa-solid fa-hard-drive" style="font-size: 40px; color: #555;"></i>
-                    <div>
-                        <strong>Dysk lokalny (C:)</strong><br>
-                        <small>Wolne miejsce: 500 GB</small>
-                    </div>
-                </div>
-                <div id="pc-drive-view" style="display:none;">
-                    <button onclick="backToPC()" style="margin-bottom:15px; cursor:pointer; padding:5px 10px;">← Powrót</button>
-                    <table class="file-table">
-                        <thead>
-                            <tr><th>Nazwa</th><th>Data</th><th>Typ</th><th>Rozmiar</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td><i class="fa-solid fa-folder" style="color:#f1c40f"></i> Windows</td><td>01.01.2026</td><td>Folder</td><td>--</td></tr>
-                            <tr><td><i class="fa-solid fa-folder" style="color:#f1c40f"></i> Program Files</td><td>05.02.2026</td><td>Folder</td><td>--</td></tr>
-                            <tr><td><i class="fa-solid fa-file-code" style="color:#0078d4"></i> config.sys</td><td>08.04.2026</td><td>Plik</td><td>1 KB</td></tr>
-                        </tbody>
-                    </table>
+                    <div><strong>Dysk lokalny (C:)</strong><br><small>Wolne miejsce: 500 GB</small></div>
                 </div>
             </div>
         </div>
-         <div id="taskbar">
+
+        <div id="taskbar">
             <i class="fa-solid fa-table-cells-large" onclick="toggleWidgets(event)" style="position:absolute; left:20px; cursor:pointer;"></i>
             <div class="task-icons">
                 <i class="fa-brands fa-windows" onclick="toggleStart(event)" style="color: #0078d4; font-size: 28px;"></i>
@@ -228,12 +203,14 @@
         <div id="start-menu" onclick="event.stopPropagation()">
             <h3 style="color:#333">Aplikacje</h3>
             <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; text-align:center;">
-                <div onclick="openApp('pc')" style="cursor:pointer;"><i class="fa-solid fa-computer" style="font-size:25px;"></i><br><small>PC</small></div>
+                <div onclick="openApp('pc')" style="cursor:pointer;"><i class="fa-solid fa-computer" style="font-size:25px; color:#555"></i><br><small>PC</small></div>
                 <div onclick="openApp('games')" style="cursor:pointer;"><i class="fa-solid fa-gamepad" style="font-size:25px; color:#ff4757;"></i><br><small>Gry</small></div>
                 <div onclick="openApp('browser')" style="cursor:pointer;"><i class="fa-brands fa-edge" style="font-size:25px; color:#0078d4;"></i><br><small>Edge</small></div>
             </div>
             <div style="margin-top:auto; text-align:right; border-top:1px solid #ddd; padding-top:10px;">
-                <button onclick="shutdownSystem()" style="background:none; border:none; cursor:pointer; color:red;"><i class="fa-solid fa-power-off"></i> Zamknij</button>
+                <button onclick="shutdownSystem()" style="background:none; border:none; cursor:pointer; color:red; font-weight: bold;">
+                    <i class="fa-solid fa-power-off"></i> Zamknij
+                </button>
             </div>
         </div>
 
@@ -242,14 +219,17 @@
     </div>
 
     <script>
+        // Start systemu
         window.onload = () => {
             setTimeout(() => { 
                 document.getElementById('boot-screen').style.display = 'none'; 
                 document.getElementById('login-screen').style.display = 'flex'; 
-            }, 2000);
-            setInterval(updateClock, 1000); updateClock();
+            }, 3000);
+            setInterval(updateClock, 1000); 
+            updateClock();
         };
 
+        // Logowanie
         document.getElementById('pass-field').addEventListener('keypress', (e) => {
             if(e.key === 'Enter' && e.target.value === "1234") {
                 document.getElementById('login-screen').style.display = 'none';
@@ -261,12 +241,25 @@
             }
         });
 
+        // Obsługa zamykania systemu
+        function shutdownSystem() {
+            closeAllPanels();
+            // Ukrywamy cały interfejs
+            document.getElementById('system-ui').style.display = 'none';
+            // Pokazujemy ekran zamykania
+            const shutdownScreen = document.getElementById('shutdown-screen');
+            shutdownScreen.style.display = 'flex';
+            
+            setTimeout(() => {
+                shutdownScreen.style.display = 'none';
+                document.getElementById('final-screen').style.display = 'flex';
+            }, 3000);
+        }
+
+        // Zarządzanie oknami
         function openApp(id) { 
-            document.getElementById('win-' + id).style.display = 'flex'; 
-            if(id === 'games') {
-                document.getElementById('game-list').style.display = 'grid';
-                document.getElementById('game-iframe').style.display = 'none';
-            }
+            const win = document.getElementById('win-' + id);
+            if(win) win.style.display = 'flex'; 
             closeAllPanels(); 
         }
         function closeApp(id) { document.getElementById('win-' + id).style.display = 'none'; }
@@ -278,18 +271,7 @@
             ifr.style.display = 'block';
         }
 
-        function openDriveC() {
-            document.getElementById('pc-home-view').style.display = 'none';
-            document.getElementById('pc-drive-view').style.display = 'block';
-            document.getElementById('pc-title').innerText = 'Dysk lokalny (C:)';
-        }
-
-        function backToPC() {
-            document.getElementById('pc-home-view').style.display = 'flex';
-            document.getElementById('pc-drive-view').style.display = 'none';
-            document.getElementById('pc-title').innerText = 'Ten komputer';
-        }
-
+        // Panele i menu
         function toggleStart(e) { e.stopPropagation(); document.getElementById('start-menu').classList.toggle('active'); }
         function toggleWidgets(e) { e.stopPropagation(); document.getElementById('widgets-panel').classList.toggle('active'); }
         function toggleNotif(e) { e.stopPropagation(); document.getElementById('notif-panel').classList.toggle('active'); }
@@ -306,16 +288,6 @@
             document.getElementById('clock-date').innerText = now.toLocaleDateString();
         }
 
-        function shutdownSystem() {
-            closeAllPanels();
-            document.getElementById('system-ui').style.display = 'none';
-            document.getElementById('shutdown-screen').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('shutdown-screen').style.display = 'none';
-                document.getElementById('final-screen').style.display = 'flex';
-            }, 3000);
-        }
-
         function dragWin(win) {
             win.onmousedown = function(e) {
                 if(e.target.tagName === 'SPAN') return;
@@ -330,3 +302,4 @@
         }
     </script>
 </body>
+</html>
